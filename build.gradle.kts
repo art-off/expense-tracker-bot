@@ -1,6 +1,7 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-    val kotlinVersion = "1.8.21"
-    kotlin("jvm") version kotlinVersion
+    kotlin("jvm") version "1.8.21"
     application
 }
 
@@ -16,8 +17,17 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.6")
 }
 
-tasks.getByName<Jar>("jar") {
-    enabled = false
+tasks.jar {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    archiveFileName.set("expense-tracker-bot.jar")
+    manifest {
+        attributes["Main-Class"] = "MainKt"
+    }
+    from(configurations.compileClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "17"
 }
 
 application {
@@ -25,5 +35,5 @@ application {
 }
 
 kotlin {
-    jvmToolchain(19)
+    jvmToolchain(17)
 }
